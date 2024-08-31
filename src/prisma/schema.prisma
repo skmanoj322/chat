@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  username String
+  messages Message[]
+  consversations ConversationPartcipant[]
+}
+
+model ConversationPartcipant{
+  consversationId String 
+  userId String
+  conversation Conversation @relation(fields: [consversationId],references: [id])
+  user User @relation(fields: [userId],references: [id])
+  @@id([consversationId,userId])
+}
+model Conversation {
+  id String @id  @default(uuid())
+  createdAt DateTime @default(now())
+  lastMessageId String? @unique
+  lastMessage Message? @relation("LastMessage",fields: [lastMessageId],references: [id])
+  messages Message[] @relation("ConversationMessages")
+  participants ConversationPartcipant[]
+  isPrivate Boolean
+}
+
+
+model Message{
+  id String @id @default(uuid())
+  sender User @relation(fields: [senderId],references: [id])
+  messageText String
+  senderId String
+  conversationId String 
+  conversation Conversation @relation("ConversationMessages" ,fields: [conversationId],references: [id])
+  conversationAsLastMessage Conversation ? @relation("LastMessage")
+  readStatus String
+
+}
+
