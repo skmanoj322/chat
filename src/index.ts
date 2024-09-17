@@ -1,32 +1,36 @@
 import express from "express";
 import dotenv from "dotenv";
 import http from "http";
-import { prismaClient } from "./prisma/prismaClient";
-import { UserManager } from "./userManager";
-import { addUser } from "./routes/addUser";
-import { userMessage } from "./routes/userMessage";
-import { usergetAllMessage } from "./routes/usersAllMessage";
-import { newConversation } from "./routes/createNewConversation";
-import { Socket } from "./socketManager";
-import { socketHandler } from "./socket";
+import { prismaClient } from "./prisma/prismaClient.js";
+import { UserManager } from "./userManager.js";
+
+import { Socket } from "./socketManager.js";
+import { socketHandler } from "./socket.js";
+import { authHandler } from "./auth/index.js";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import cors from "cors";
+import { authenticateToken } from "./middleware/authenticateToken.js";
+import { routerV1 } from "./routes/index.js";
+
+const __filename = fileURLToPath(import.meta.url);
 
 dotenv.config();
 
 const app = express();
+
 app.use(express.json());
+app.use(cors());
 const port = process.env.PORT;
 export const server = http.createServer(app);
 export const prisma = prismaClient.getInstance();
 export const wss = Socket.getInstance(server);
 export const manager = UserManager.getInstance();
-app.use("/chat/v1/addUser", addUser);
 
-app.use("/chat/v1/getMessage", userMessage);
-app.use("/chat/v1/getAllMessages", usergetAllMessage);
+const redirectUri = "http://localhost:3000/auth/callback/google";
 
-app.use("/chat/v1/createNewConversation", newConversation);
+app.use("/chat", authenticateToken, routerV1);
 wss.WebSocketConnect(socketHandler);
-
 server.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });

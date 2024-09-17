@@ -1,7 +1,6 @@
-import { WebSocket, Server, RawData } from "ws";
-import { server } from "./index";
+import { WebSocket, WebSocketServer as Server, RawData } from "ws";
+import { server } from "./index.js";
 import http from "http";
-import { k } from "vite/dist/node/types.d-aGj9QkWt";
 interface Subscription {
   [key: string]: {
     ws: WebSocket;

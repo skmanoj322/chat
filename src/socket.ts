@@ -1,8 +1,7 @@
 import { Request } from "express";
-import { manager, prisma, wss } from ".";
-import { participants } from "./types";
+import { manager, prisma, wss } from "./index.js";
+import { participants } from "./types.js";
 import { WebSocket } from "ws";
-//asdksa
 export const socketHandler = async (ws: WebSocket, req: Request) => {
   const urlObj = new URL(req.url, `ws://${req.headers.host}`);
   const userId = urlObj.searchParams.get("userId") as string;

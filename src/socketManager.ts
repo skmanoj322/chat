@@ -1,4 +1,4 @@
-import { WebSocket, Server } from "ws";
+import WebSocket, { WebSocketServer } from "ws";
 
 import { Server as HttpServer } from "http";
 import { Request } from "express";
@@ -6,10 +6,10 @@ import { Request } from "express";
 export class Socket {
   private static instance: Socket;
 
-  private wss: Server;
+  private wss: any;
 
   private constructor(server: HttpServer) {
-    this.wss = new WebSocket.Server({ server });
+    this.wss = new WebSocketServer({ server });
   }
 
   public static getInstance(server: HttpServer) {
