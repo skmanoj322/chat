@@ -21,6 +21,9 @@ export const wss = Socket.getInstance(server);
 export const manager = UserManager.getInstance();
 const redirectUri = "http://localhost:3000/auth/callback/google";
 app.use("/chat", authenticateToken, routerV1);
+app.get("/", (req, res) => {
+    res.send("Hello aws");
+});
 wss.WebSocketConnect(socketHandler);
 server.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);

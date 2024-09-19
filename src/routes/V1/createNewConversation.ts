@@ -64,7 +64,6 @@ newConversation.post("", async (req, res) => {
           participants: true,
         },
       });
-      //saldas
       return res.send({
         message: "conversation ssucessfully created",
         conversation: conversation,
