@@ -31,7 +31,7 @@ const redirectUri = "http://localhost:3000/auth/callback/google";
 
 app.use("/chat", authenticateToken, routerV1);
 app.get("/", (req, res) => {
-  res.send("Lol its working");
+  res.send("Lol its working! not workin");
 });
 wss.WebSocketConnect(socketHandler);
 server.listen(port, () => {
