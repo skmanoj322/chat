@@ -4,7 +4,6 @@ import http from "http";
 import { prismaClient } from "./prisma/prismaClient.js";
 import { UserManager } from "./userManager.js";
 import { Socket } from "./socketManager.js";
-import { socketHandler } from "./socket.js";
 import { fileURLToPath } from "url";
 import cors from "cors";
 import { authenticateToken } from "./middleware/authenticateToken.js";
@@ -22,9 +21,9 @@ export const manager = UserManager.getInstance();
 const redirectUri = "http://localhost:3000/auth/callback/google";
 app.use("/chat", authenticateToken, routerV1);
 app.get("/", (req, res) => {
-    res.send("Hello aws");
+    res.send("Hello aws 1234");
 });
-wss.WebSocketConnect(socketHandler);
+// wss.WebSocketConnect(socketHandler);
 server.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
 });

@@ -21,7 +21,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-const port = process.env.PORT || 3001;
+const port = process.env.PORT;
 export const server = http.createServer(app);
 export const prisma = prismaClient.getInstance();
 export const wss = Socket.getInstance(server);
@@ -33,7 +33,7 @@ app.use("/chat", authenticateToken, routerV1);
 app.get("/", (req, res) => {
   res.send("Hello aws 1234");
 });
-wss.WebSocketConnect(socketHandler);
+// wss.WebSocketConnect(socketHandler);
 server.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
