@@ -21,7 +21,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-const port = process.env.PORT;
+const port = process.env.PORT || 3001;
 export const server = http.createServer(app);
 export const prisma = prismaClient.getInstance();
 export const wss = Socket.getInstance(server);
