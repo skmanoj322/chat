@@ -23,7 +23,7 @@ export const manager = UserManager.getInstance();
 const redirectUri = "http://localhost:3000/auth/callback/google";
 app.use("/chat", authenticateToken, routerV1);
 app.get("/", (req, res) => {
-    res.send("PING PONG 111");
+    res.send("PING PONG");
 });
 app.use("/auth/google", authHandler);
 wss.WebSocketConnect(socketHandler);
