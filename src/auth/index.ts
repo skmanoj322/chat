@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 import { error } from "console";
 
 export const authHandler = Router();
-export const authCallback = Router();
 
 export interface CustomRequest extends Request {
   user?: string | object;
@@ -46,7 +45,6 @@ authHandler.post("", async (req: Request, res: Response) => {
           });
         }
         const token = generateAccessToken(email);
-        console.log("TOKEN", token);
 
         return res.status(200).json({ access_token: token });
       }

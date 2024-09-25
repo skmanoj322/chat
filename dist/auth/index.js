@@ -3,7 +3,6 @@ import { google } from "googleapis";
 import { prisma } from "../index.js";
 import jwt from "jsonwebtoken";
 export const authHandler = Router();
-export const authCallback = Router();
 export const access_token_key = process.env.JWT_ACCESS;
 const refresh_token_key = process.env.JWT_REFRESH;
 authHandler.post("", async (req, res) => {
@@ -38,7 +37,6 @@ authHandler.post("", async (req, res) => {
                     });
                 }
                 const token = generateAccessToken(email);
-                console.log("TOKEN", token);
                 return res.status(200).json({ access_token: token });
             }
             return res.send({ message: "Couuld not authnticate" });

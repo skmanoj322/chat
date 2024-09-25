@@ -31,8 +31,10 @@ const redirectUri = "http://localhost:3000/auth/callback/google";
 
 app.use("/chat", authenticateToken, routerV1);
 app.get("/", (req, res) => {
-  res.send("CHATGPt");
+  res.send("PING_PONG");
 });
+app.use("/auth/google", authHandler);
+
 wss.WebSocketConnect(socketHandler);
 server.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);

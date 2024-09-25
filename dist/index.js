@@ -5,6 +5,7 @@ import { prismaClient } from "./prisma/prismaClient.js";
 import { UserManager } from "./userManager.js";
 import { Socket } from "./socketManager.js";
 import { socketHandler } from "./socket.js";
+import { authHandler } from "./auth/index.js";
 import { fileURLToPath } from "url";
 import cors from "cors";
 import { authenticateToken } from "./middleware/authenticateToken.js";
@@ -22,8 +23,9 @@ export const manager = UserManager.getInstance();
 const redirectUri = "http://localhost:3000/auth/callback/google";
 app.use("/chat", authenticateToken, routerV1);
 app.get("/", (req, res) => {
-    res.send("CHATGPt");
+    res.send("PING_PONG");
 });
+app.use("/auth/google", authHandler);
 wss.WebSocketConnect(socketHandler);
 server.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
