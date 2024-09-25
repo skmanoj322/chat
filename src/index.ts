@@ -34,7 +34,6 @@ app.get("/", (req, res) => {
   res.send("PING PONG 111");
 });
 app.use("/auth/google", authHandler);
-
 wss.WebSocketConnect(socketHandler);
 server.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
