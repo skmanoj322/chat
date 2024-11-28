@@ -3,7 +3,6 @@ import { prisma } from "../../index.js";
 export const conversationById = Router();
 
 conversationById.get("", async (req, res) => {
-	//TESTING URL
 	const urlObj = new URL(req.url, `http://${req.headers.host}`);
 	// res.send({ urlObj });
 	const conversationId = urlObj.searchParams.get("conversationId") as string;
