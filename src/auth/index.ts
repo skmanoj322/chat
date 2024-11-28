@@ -3,12 +3,12 @@ import { google } from "googleapis";
 import { prisma } from "../index.js";
 
 import jwt from "jsonwebtoken";
-import { error } from "console";
+import { CustomJwtPayload } from "../middleware/authenticateToken.js";
 
 export const authHandler = Router();
 
 export interface CustomRequest extends Request {
-  user?: string | object;
+  user?: CustomJwtPayload | string;
 }
 export const access_token_key = process.env.JWT_ACCESS as string;
 const refresh_token_key = process.env.JWT_REFRESH as string;
@@ -24,12 +24,10 @@ authHandler.post("", async (req: Request, res: Response) => {
     });
     try {
       const userInfo = await oauth2.userinfo.get();
-      console.log(userInfo.data);
       const { email, given_name, family_name, picture } = userInfo.data;
 
       if (email) {
-        console.log("EMAIL,email", email);
-        const UserAlreadyExist = await prisma.user.findUnique({
+        let UserAlreadyExist = await prisma.user.findUnique({
           where: {
             email: email,
           },
@@ -43,10 +41,12 @@ authHandler.post("", async (req: Request, res: Response) => {
               dp: picture,
             },
           });
+          UserAlreadyExist = fristTimeUser;
         }
-        const token = generateAccessToken(email);
-
-        return res.status(200).json({ access_token: token });
+        if (UserAlreadyExist !== null) {
+          const token = generateAccessToken(UserAlreadyExist.id);
+          return res.status(200).json({ access_token: token });
+        }
       }
 
       return res.send({ message: "Couuld not authnticate" });
@@ -55,10 +55,9 @@ authHandler.post("", async (req: Request, res: Response) => {
     }
   }
 });
-function generateAccessToken(user: string) {
+function generateAccessToken(id: string) {
   try {
-    console.log("JSON");
-    return jwt.sign({ user }, access_token_key, { expiresIn: "1d" });
+    return jwt.sign({ id }, access_token_key, { expiresIn: "1d" });
   } catch (error) {
     console.log(error);
   }

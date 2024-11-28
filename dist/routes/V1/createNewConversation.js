@@ -3,46 +3,39 @@ import { prisma } from "../../index.js";
 export const newConversation = Router();
 newConversation.post("", async (req, res) => {
     const urlObj = new URL(req.url, `http://${req.headers.host}`);
-    const currentUser = urlObj.searchParams.get("userId");
+    const currentUser = req.user;
+    let conversationExists;
     const { connectTo } = req.body;
-    const currentUserExists = await prisma.user.findUnique({
-        where: {
-            id: currentUser,
-        },
-    });
-    const connectToUserExists = await prisma.user.findUnique({
-        where: {
-            id: connectTo,
-        },
-    });
-    if (!connectToUserExists || !currentUserExists) {
-        return res.status(400).send({
-            messsage: "User doesnt exists",
+    console.log(connectTo, currentUser);
+    try {
+        conversationExists = await prisma.conversation.findFirst({
+            where: {
+                AND: [
+                    {
+                        participants: {
+                            some: {
+                                userId: connectTo,
+                            },
+                        },
+                    },
+                    {
+                        participants: {
+                            some: {
+                                // @ts-ignore
+                                userId: currentUser?.user,
+                            },
+                        },
+                    },
+                ],
+            },
+            include: {
+                participants: true,
+            },
         });
     }
-    const conversationExists = await prisma.conversation.findFirst({
-        where: {
-            AND: [
-                {
-                    participants: {
-                        some: {
-                            userId: connectTo,
-                        },
-                    },
-                },
-                {
-                    participants: {
-                        some: {
-                            userId: currentUser,
-                        },
-                    },
-                },
-            ],
-        },
-        include: {
-            participants: true,
-        },
-    });
+    catch (error) {
+        return res.send({ message: "ERROR 404", error: error });
+    }
     if (!conversationExists) {
         try {
             const conversation = await prisma.conversation.create({
@@ -54,7 +47,8 @@ newConversation.post("", async (req, res) => {
                                 userId: connectTo,
                             },
                             {
-                                userId: currentUser,
+                                // @ts-ignore
+                                userId: currentUser?.user,
                             },
                         ],
                     },

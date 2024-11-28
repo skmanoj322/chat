@@ -20,7 +20,6 @@ searchUser.get("", [
     validateQueryParams,
 ], async (req, res) => {
     const errors = validationResult(req);
-    console.log(errors);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
@@ -34,8 +33,12 @@ searchUser.get("", [
         const user = await prisma.user.findMany({
             where: {
                 OR: [{ email: filters.email }, { firstName: filters.username }],
+                NOT: {
+                    // @ts-ignore
+                    id: req.user.id,
+                },
             },
-            take: parseInt(page),
+            take: parseInt(limit),
             skip: (parseInt(page) - 1) * parseInt(limit),
             orderBy: {
                 [sortBy]: order,

@@ -17,11 +17,9 @@ authHandler.post("", async (req, res) => {
         });
         try {
             const userInfo = await oauth2.userinfo.get();
-            console.log(userInfo.data);
             const { email, given_name, family_name, picture } = userInfo.data;
             if (email) {
-                console.log("EMAIL,email", email);
-                const UserAlreadyExist = await prisma.user.findUnique({
+                let UserAlreadyExist = await prisma.user.findUnique({
                     where: {
                         email: email,
                     },
@@ -35,9 +33,12 @@ authHandler.post("", async (req, res) => {
                             dp: picture,
                         },
                     });
+                    UserAlreadyExist = fristTimeUser;
                 }
-                const token = generateAccessToken(email);
-                return res.status(200).json({ access_token: token });
+                if (UserAlreadyExist !== null) {
+                    const token = generateAccessToken(UserAlreadyExist.id);
+                    return res.status(200).json({ access_token: token });
+                }
             }
             return res.send({ message: "Couuld not authnticate" });
         }
@@ -46,10 +47,9 @@ authHandler.post("", async (req, res) => {
         }
     }
 });
-function generateAccessToken(user) {
+function generateAccessToken(id) {
     try {
-        console.log("JSON");
-        return jwt.sign({ user }, access_token_key, { expiresIn: "1d" });
+        return jwt.sign({ id }, access_token_key, { expiresIn: "1d" });
     }
     catch (error) {
         console.log(error);

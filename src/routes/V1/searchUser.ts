@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { prisma } from "../../index.js";
 import { query, validationResult } from "express-validator";
+import { CustomRequest } from "../../auth/index.js";
 
 export const searchUser = Router();
 
@@ -29,9 +30,8 @@ searchUser.get(
       .withMessage("Must be a valid email address"),
     validateQueryParams,
   ],
-  async (req: Request, res: Response) => {
+  async (req: CustomRequest, res: Response) => {
     const errors = validationResult(req);
-    console.log(errors);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
@@ -51,8 +51,12 @@ searchUser.get(
       const user = await prisma.user.findMany({
         where: {
           OR: [{ email: filters.email }, { firstName: filters.username }],
+          NOT: {
+            // @ts-ignore
+            id: req.user.id,
+          },
         },
-        take: parseInt(page as string),
+        take: parseInt(limit as string),
         skip: (parseInt(page as string) - 1) * parseInt(limit as string),
         orderBy: {
           [sortBy as string]: order as "asc" | "desc",

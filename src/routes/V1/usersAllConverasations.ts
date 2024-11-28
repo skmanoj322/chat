@@ -1,29 +1,58 @@
-import { error } from "console";
 import { Router } from "express";
 import { prisma } from "../../index.js";
-
+import { CustomRequest } from "../../auth/index.js";
+import { CustomJwtPayload } from "../../middleware/authenticateToken.js";
 export const allConversation = Router();
 
-allConversation.get("/", async (req, res) => {
-  const urlObj = new URL(req.url, `http://${req.headers.host}`);
+allConversation.get("/", async (req: CustomRequest, res) => {
+  const { id } = req.user as CustomJwtPayload;
 
-  const me = urlObj.searchParams.get("me") as string;
+  if (id === undefined) {
+    return res.send({
+      id: "Invalid user",
+    });
+  }
   try {
-    const conversations = await prisma.conversationPartcipant.findMany({
+    const conversations = await prisma.conversation.findMany({
       where: {
-        userId: me,
+        participants: {
+          some: {
+            userId: id,
+          },
+        },
       },
-      include: {
-        conversation: {
-          include: {
-            messages: {
-              take: 1,
-              orderBy: {
-                createdAt: "desc",
+      select: {
+        participants: {
+          where: {
+            userId: {
+              not: id,
+            },
+          },
+          select: {
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                dp: true,
               },
             },
           },
         },
+        lastMessage: {
+          select: {
+            messageText: true,
+            sender: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+            createdAt: true,
+            readStatus: true,
+          },
+        },
+        isPrivate: true,
+        name: true,
       },
     });
     return res.send(conversations);

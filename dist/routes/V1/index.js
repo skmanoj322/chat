@@ -12,4 +12,3 @@ export * from "./createNewConversation.js";
 export * from "./searchUser.js";
 export * from "./userConversationById.js";
 export * from "./usersAllConverasations.js";
-export * from "./searchUser.js";

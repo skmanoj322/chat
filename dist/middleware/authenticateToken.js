@@ -6,10 +6,12 @@ export function authenticateToken(req, res, next) {
     if (!token) {
         return res.status(401).json({ message: "Token missing" });
     }
-    jwt.verify(token, access_token_key, (error, user) => {
+    jwt.verify(token, access_token_key, async (error, user) => {
         if (error)
             return res.status(401).json({ message: "Invalid Token" });
-        req.user = user;
+        if (user && typeof user === "object") {
+            req.user = user;
+        }
         next();
     });
 }

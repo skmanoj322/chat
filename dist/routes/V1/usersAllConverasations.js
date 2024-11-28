@@ -2,24 +2,53 @@ import { Router } from "express";
 import { prisma } from "../../index.js";
 export const allConversation = Router();
 allConversation.get("/", async (req, res) => {
-    const urlObj = new URL(req.url, `http://${req.headers.host}`);
-    const me = urlObj.searchParams.get("me");
+    const { id } = req.user;
+    if (id === undefined) {
+        return res.send({
+            id: "Invalid user",
+        });
+    }
     try {
-        const conversations = await prisma.conversationPartcipant.findMany({
+        const conversations = await prisma.conversation.findMany({
             where: {
-                userId: me,
+                participants: {
+                    some: {
+                        userId: id,
+                    },
+                },
             },
-            include: {
-                conversation: {
-                    include: {
-                        messages: {
-                            take: 1,
-                            orderBy: {
-                                createdAt: "desc",
+            select: {
+                participants: {
+                    where: {
+                        userId: {
+                            not: id,
+                        },
+                    },
+                    select: {
+                        user: {
+                            select: {
+                                firstName: true,
+                                lastName: true,
+                                dp: true,
                             },
                         },
                     },
                 },
+                lastMessage: {
+                    select: {
+                        messageText: true,
+                        sender: {
+                            select: {
+                                firstName: true,
+                                lastName: true,
+                            },
+                        },
+                        createdAt: true,
+                        readStatus: true,
+                    },
+                },
+                isPrivate: true,
+                name: true,
             },
         });
         return res.send(conversations);

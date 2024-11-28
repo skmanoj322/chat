@@ -1,51 +1,53 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 model User {
-  id String @id @default(uuid())
-  createdAt DateTime @default(now())
-  email String @unique
-  dp String?
-  firstName String
-  lastName String?
-  messages Message[]
-  refreshToken String?
+  id             String                   @id @default(uuid())
+  createdAt      DateTime                 @default(now())
+  email          String                   @unique
+  dp             String?
+  firstName      String
+  lastName       String?
+  messages       Message[]
+  refreshToken   String?
   consversations ConversationPartcipant[]
 }
 
-model ConversationPartcipant{
-  consversationId String @default(uuid())
-  userId String
-  conversation Conversation @relation(fields: [consversationId],references: [id])
-  user User @relation(fields: [userId],references: [id])
-  @@id([consversationId,userId])
+model ConversationPartcipant {
+  consversationId String       @default(uuid())
+  userId          String
+  conversation    Conversation @relation(fields: [consversationId], references: [id])
+  user            User         @relation(fields: [userId], references: [id])
+
+  @@id([consversationId, userId])
 }
+
 model Conversation {
-  id String @id  @default(uuid())
-  createdAt DateTime @default(now())
-  lastMessageId String? @unique
-  lastMessage Message? @relation("LastMessage",fields: [lastMessageId],references: [id])
-  messages Message[] @relation("ConversationMessages")
-  participants ConversationPartcipant[]
-  isPrivate Boolean
+  id            String                   @id @default(uuid())
+  createdAt     DateTime                 @default(now())
+  lastMessageId String?                  @unique
+  lastMessage   Message?                 @relation("LastMessage", fields: [lastMessageId], references: [id])
+  messages      Message[]                @relation("ConversationMessages")
+  participants  ConversationPartcipant[]
+  isPrivate     Boolean
+  name          String?
 }
 
-
-model Message{
-  id String @id @default(uuid())
-  sender User @relation(fields: [senderId],references: [id])
-  messageText String
-  senderId String
-  conversationId String 
-  conversation Conversation @relation("ConversationMessages" ,fields: [conversationId],references: [id])
-  conversationAsLastMessage Conversation ? @relation("LastMessage")
-  readStatus String
+model Message {
+  id                        String        @id @default(uuid())
+  sender                    User          @relation(fields: [senderId], references: [id])
+  messageText               String
+  senderId                  String
+  conversationId            String
+  conversation              Conversation  @relation("ConversationMessages", fields: [conversationId], references: [id])
+  conversationAsLastMessage Conversation? @relation("LastMessage")
+  readStatus                String
 
   createdAt DateTime @default(now())
-
 }
-
